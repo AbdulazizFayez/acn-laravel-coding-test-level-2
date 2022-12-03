@@ -36,6 +36,11 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+
+        if(! in_array($request->user()->Role(), 'PRODUCT_OWNER')){
+            return back()->with('error', 'You do not have the permissoin to create a Task');
+        }
+
         $request->validate([
             'name' => 'required',
         ]);
