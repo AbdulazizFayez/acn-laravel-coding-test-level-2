@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
-class ProjectController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,18 +15,8 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $getProjects = Project::all();
-        return $getProjects;
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $getUsers = User::all();
+        return $getUsers;
     }
 
     /**
@@ -38,17 +29,19 @@ class ProjectController extends Controller
     {
         $request->validate([
             'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required',
         ]);
 
         //Autogenerate ID for the UUID
         $request['id'] = Str::uuid();
-        $newProject = Project::create($request->all());
+        $newUser = User::create($request->all());
 
-        if ($newProject) {
+        if ($newUser) {
             return response()->json([
                 // 'data' => [
                 'message' => 'Success',
-                'projectData' => $newProject,
+                'userData' => $newUser,
                 // ],
             ], 201);
         } else {
@@ -66,19 +59,8 @@ class ProjectController extends Controller
      */
     public function show($id)
     {
-        $getProjects = Project::find($id);
-        return $getProjects;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        $getUsers = User::find($id);
+        return $getUsers;
     }
 
     /**
@@ -90,9 +72,9 @@ class ProjectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $updateProject = Project::where('id', $id)->update($request->all());
+        $updateUser = User::where('id', $id)->update($request->all());
 
-        if ($updateProject) {
+        if ($updateUser) {
             return response()->json([
                 'message' => 'Success',
             ], 201);
@@ -111,8 +93,8 @@ class ProjectController extends Controller
      */
     public function destroy($id)
     {
-        $deleteProject = Project::where('id', $id)->delete();
-        if ($deleteProject) {
+        $deleteUser = User::where('id', $id)->delete();
+        if ($deleteUser) {
             return response()->json([
                 'message' => 'Success',
             ], 201);

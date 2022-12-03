@@ -14,7 +14,8 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        $getTasks = Task::all();
+        return $getTasks;
     }
 
     /**
@@ -35,27 +36,48 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'status' => 'required',
+            'project_id' => 'required',
+            'user_id' => 'required',
+        ]);
+
+        //Autogenerate ID for the UUID
+        $request['id'] = Str::uuid();
+        $newTask = Task::create($request->all());
+
+        if ($newTask) {
+            return response()->json([
+                'message' => 'Success',
+                'taskData' => $newTask,
+            ], 201);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+            ], 400);
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Task  $task
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Task $task)
+    public function show($id)
     {
-        //
+        $getTasks = Task::find($id);
+        return $getTasks;
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Task  $task
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Task $task)
+    public function edit($id)
     {
         //
     }
@@ -64,22 +86,41 @@ class TaskController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Task  $task
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Task $task)
+    public function update(Request $request, $id)
     {
-        //
+        $updateTask = Task::where('id', $id)->update($request->all());
+
+        if ($updateTask) {
+            return response()->json([
+                'message' => 'Success',
+            ], 201);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+            ], 400);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Task  $task
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Task $task)
+    public function destroy($id)
     {
-        //
+        $deleteTask = Task::where('id', $id)->delete();
+        if ($deleteTask) {
+            return response()->json([
+                'message' => 'Success',
+            ], 201);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+            ], 400);
+        }
     }
 }
