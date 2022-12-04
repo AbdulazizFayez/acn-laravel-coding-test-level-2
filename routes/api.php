@@ -21,6 +21,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('users', UserController::class);
+Route::resource('users', UserController::class);//->middleware('role:ADMIN');;
 Route::resource('project', ProjectController::class);
 Route::resource('task', TaskController::class);

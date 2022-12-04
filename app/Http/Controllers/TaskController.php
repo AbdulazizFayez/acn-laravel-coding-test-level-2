@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
 {
@@ -36,6 +37,10 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        if (!in_array($request->user()->Role(), 'PRODUCT_OWNER')) {
+            return back()->with('error', 'You do not have the permissoin to create a Task');
+        }
+
         $request->validate([
             'title' => 'required',
             'status' => 'required',
@@ -45,6 +50,9 @@ class TaskController extends Controller
 
         //Autogenerate ID for the UUID
         $request['id'] = Str::uuid();
+
+        //Required that on new task
+        $request['status'] = 'NOT_STARTED';
         $newTask = Task::create($request->all());
 
         if ($newTask) {
@@ -91,6 +99,26 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!in_array($request->user()->Role(), 'PRODUCT_OWNER')) {
+            return back()->with('error', 'You do not have the permissoin to create a Task');
+        }
+
+        $getUserTasks = Task::find('user_id', auth()->user()->id());
+        
+        //Confirm that only the user with related task is the one editting
+        if (!in_array($getUserTasks->id, $id)) {
+            return back()->with('error', 'You do not have the permissoin to edit this Task');
+        }
+
+        $validStatuses = array('NOT_STARTED', 'IN_PROGRESS', 'READY_FOR_TEST', 'COMPLETED');
+
+        $request->validate([
+            'title' => 'required',
+            'status' => 'required', Rule::in($validStatuses),
+            'project_id' => 'required',
+            'user_id' => 'required',
+        ]);
+
         $updateTask = Task::where('id', $id)->update($request->all());
 
         if ($updateTask) {
