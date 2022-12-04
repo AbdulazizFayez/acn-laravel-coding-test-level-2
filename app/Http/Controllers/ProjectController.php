@@ -12,10 +12,22 @@ class ProjectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $getProjects = Project::all();
-        return $getProjects;
+        $q = $request->q ?? null;
+        $pageIndex = $request->q ?? 0;
+        $pageSize = $request->pageSize ?? 3;
+        $sortBy = $request->sortBy ?? 'name';
+        $sortDirection = $request->sortDirection ?? 'ASC';
+
+        $getProjects = Project::orderBy($sortBy, $sortDirection);
+
+        if ($q) {
+            $getProjects->where('name', 'like', '%', $q, '%');
+        }
+
+        $getProjects->paginate($pageSize);
+        return $getProjects->get();
     }
 
     /**
