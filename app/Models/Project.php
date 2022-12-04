@@ -13,4 +13,16 @@ class Project extends Model
         'id',
         'name'      
     ];
+
+    protected $keyType = 'string';
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($issue) {
+            $issue->id = Str::uuid(36);
+        });
+    }
+
 }

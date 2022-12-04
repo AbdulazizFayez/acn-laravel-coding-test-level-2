@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -44,7 +44,27 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function Role(){
-        return $this->belongsToMany('App\Moddels\Role');
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($issue) {
+            $issue->id = Str::uuid(36);
+        });
+    }
+
+    public function Role()
+    {
+
+        return User::select('roles.name')            
+            ->leftJoin('user_roles', 'user_id', '=', 'users.id')
+            ->leftJoin('roles', 'roles.id', '=', 'user_roles.role_id')
+            ->where('users.id', auth()->user()->id)
+            ->get();
+
     }
 }

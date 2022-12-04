@@ -37,24 +37,22 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
 
-        if(! in_array($request->user()->Role(), 'PRODUCT_OWNER')){
-            return back()->with('error', 'You do not have the permissoin to create a Task');
+        if (!in_array($request->user()->Role(), 'PRODUCT_OWNER')) {
+            return ('You do not have the permissoin to create a Task');
         }
 
         $request->validate([
             'name' => 'required',
         ]);
 
-        //Autogenerate ID for the UUID
-        $request['id'] = Str::uuid();
         $newProject = Project::create($request->all());
 
         if ($newProject) {
             return response()->json([
-                // 'data' => [
+
                 'message' => 'Success',
                 'projectData' => $newProject,
-                // ],
+
             ], 201);
         } else {
             return response()->json([

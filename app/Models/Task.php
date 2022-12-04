@@ -17,4 +17,16 @@ class Task extends Model
         'project_id',
         'user_id'
     ];
+
+    protected $keyType = 'string';
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($issue) {
+            $issue->id = Str::uuid(36);
+        });
+    }
+
 }

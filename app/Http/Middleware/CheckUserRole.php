@@ -15,9 +15,9 @@ class CheckUserRole
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next, $role)
-    {
-        if (! in_array($request->user()->Role(), 'ADMIN')) {
-            return back()->with('error', 'You do not have a permission to access this content.');
+    { 
+        if (! in_array(auth()->user()->Role(), $role)) {
+            return 'You do not have a permission to access this content';
 
         }
         return $next($request);
